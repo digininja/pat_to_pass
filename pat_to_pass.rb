@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+ï»¿#!/usr/bin/env ruby
 # encoding: utf-8
 
 
@@ -71,12 +71,12 @@ end
 		"tl" => "qwert",
 		"ml" => "asdfg",
 		"bl" => "yxcvb",
-		"r" => "zuiopühjklöänm",
-		"tr" => "zuiopü",
-		"mr" => "hjklö",
+		"r" => "zuiopÃ¼hjklÃ¶Ã¤nm",
+		"tr" => "zuiopÃ¼",
+		"mr" => "hjklÃ¶",
 		"br" => "nm",
 		"nl" => "123456",
-		"nr" => "7890ß",
+		"nr" => "7890ÃŸ",
 	}
 
 @layout == "UK" # set to default layout - UK
