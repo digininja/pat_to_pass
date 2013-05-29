@@ -1,7 +1,6 @@
 ﻿#!/usr/bin/env ruby
 # encoding: utf-8
 
-
 # == Pat to Pass - keyboard patterns to wordlists
 # 
 # == Usage
@@ -22,12 +21,12 @@
 
 version = "1.1"
 puts '''
-	 ____    __   ____    ____   __     ____    __    ____ 
-	(  _ \  / _\ (_  _)  (_  _) /  \   (  _ \  / _\  / ___)
-	 ) __/ /    \  )(      )(  (  O )   ) __/ /    \ \___ \
-	(__)   \_/\_/ (__)    (__)  \__/   (__)   \_/\_/ (____/
-							ver.''' + version
-puts "\nPat to Pass #{version} Robin Wood (robin@digininja.org) (www.digininja.org)"
+	 ____    __   ____    ____   __     ____    __    ____   ____ 
+	(  _ \  / _\ (_  _)  (_  _) /  \   (  _ \  / _\  / ___) / ___)
+	 ) __/ /    \  )(      )(  (  O )   ) __/ /    \ \___ \ \___ \
+	(__)   \_/\_/ (__)    (__)  \__/   (__)   \_/\_/ (____/ (____/
+							       ver.''' + version
+puts "\nPat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)"
 
 begin
 	require "levenshtein"
@@ -79,7 +78,7 @@ end
 		"nr" => "7890ß",
 	}
 
-@layout == "UK" # set to default layout - UK
+@layout == "UK" # set to default layout
 
 opts = GetoptLong.new(
 	[ '--help', '-h', "-?", GetoptLong::NO_ARGUMENT ],
