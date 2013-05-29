@@ -78,7 +78,7 @@ end
 		"nr" => "7890ß",
 	}
 
-@layout == "UK" # set to default layout
+@layout = "UK" # set to default layout
 
 opts = GetoptLong.new(
 	[ '--help', '-h', "-?", GetoptLong::NO_ARGUMENT ],
