@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env ruby
+#!/usr/bin/env ruby
 # encoding: utf-8
 
 # == Pat to Pass - keyboard patterns to wordlists
@@ -26,7 +26,7 @@ puts '''
 	 ) __/ /    \  )(      )(  (  O )   ) __/ /    \ \___ \ \___ \
 	(__)   \_/\_/ (__)    (__)  \__/   (__)   \_/\_/ (____/ (____/
 							       ver.''' + version
-puts "\nPat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)"
+puts "\nPat to Pass #{version} Robin Wood (robin@digininja.org) (www.digininja.org)"
 
 begin
 	require "levenshtein"
@@ -325,3 +325,4 @@ passwords.each do |word|
 		end
 	end
 end
+
