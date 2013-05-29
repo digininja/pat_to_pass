@@ -1,4 +1,6 @@
-#!/usr/bin/env ruby
+﻿#!/usr/bin/env ruby
+# encoding: utf-8
+
 
 # == Pat to Pass - keyboard patterns to wordlists
 # 
@@ -18,19 +20,37 @@
 # Licence:: Creative Commons Attribution-Share Alike 2.0
 #
 
-require "levenshtein"
+version = "1.1"
+puts '''
+	 ____    __   ____    ____   __     ____    __    ____ 
+	(  _ \  / _\ (_  _)  (_  _) /  \   (  _ \  / _\  / ___)
+	 ) __/ /    \  )(      )(  (  O )   ) __/ /    \ \___ \
+	(__)   \_/\_/ (__)    (__)  \__/   (__)   \_/\_/ (____/
+							ver.''' + version
+puts "\nPat to Pass #{version} Robin Wood (robin@digininja.org) (www.digininja.org)"
+
+begin
+	require "levenshtein"
+rescue LoadError
+	# catch error and prodive feedback on installing gem
+	puts "\nError: levenshtein gem not installed\n"
+	puts "\t use: \"gem install levenshtein-ffi\" to install the required gem\n\n"
+	exit
+end
+
 require 'getoptlong'
 
 if RUBY_VERSION =~ /1\.8/
-	puts "Sorry, Pat to Pass only works correctly on Ruby >= 1.9.x."
-	puts
+	puts "Sorry, Pat to Pass only works correctly on Ruby >= 1.9.x.\n\n"
 	exit
 end
 
 # UK keyboard layout
 # Note: For proof of concept purposes no symbols are included
 
-@keys = {
+@keys = Hash.new()
+@keys["UK"] = Hash.new()
+@keys["UK"] = {
 		"l" => "qwertasdfgzxcvb",
 		"tl" => "qwert",
 		"ml" => "asdfg",
@@ -43,25 +63,43 @@ end
 		"nr" => "7890",
 	}
 
+# DE keyboard layout
+# Note: For proof of concept purposes only umlaut special chars are included
+@keys["DE"] = Hash.new()
+@keys["DE"] = {
+		"l" => "qwertasdfgyxcvb",
+		"tl" => "qwert",
+		"ml" => "asdfg",
+		"bl" => "yxcvb",
+		"r" => "zuiopühjklöänm",
+		"tr" => "zuiopü",
+		"mr" => "hjklö",
+		"br" => "nm",
+		"nl" => "123456",
+		"nr" => "7890ß",
+	}
+
+@layout == "UK" # set to default layout - UK
+
 opts = GetoptLong.new(
 	[ '--help', '-h', "-?", GetoptLong::NO_ARGUMENT ],
 	[ '--disp-keys', GetoptLong::NO_ARGUMENT ],
 	[ '--dictionary', "-d" , GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--output', "-o" , GetoptLong::REQUIRED_ARGUMENT ],
 	[ '--lev-dist', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--layout', "-l" , GetoptLong::OPTIONAL_ARGUMENT]
 )
 
 # Display the usage
 def usage
-	puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Usage: pat_to_pass [OPTION] ... PATTERN
+	puts"\nUsage: pat_to_pass [OPTION] ... PATTERN
 	--help, -h: show help
 	--disp-keys: display the pattern options
 	--output, -o <filename>: output to file
 	--dictionary, -d <dictionary>: The dictionary to use for the Levenshtein tests
 	--lev-distance: Tollerance for Levenshtein distance, default 3
 	--recursive: Use a recursive algorithm rather than basic looping
+	--layout, -l <layout>: Specify keyboard layout (UK,DE supported)
 
 	PATTERN: The pattern to generate words from
 
@@ -74,9 +112,7 @@ mr,tl = middle right followed by top left
 
 use --disp-keys to see a full list of pattern options.
 
-WARNING - long patterns will take a long time to run, start small
-
-"
+WARNING - long patterns will take a long time to run, start small\n\n"
 	exit
 end
 
@@ -101,33 +137,32 @@ begin
 				basic_looping = false
 			when '--help'
 				usage
+			when '--layout'
+				if @keys["#{arg.upcase}"]
+					puts "\nKeyboard layout set to: #{arg.upcase}\n"
+					@layout = arg.upcase
+				else
+					puts "\nUnsupported keyboard layout specified: #{arg.upcase}\n\n"
+					exit 1
+				end
 			when '--disp-keys'
-				puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-The following are valid pattern values:
-
-"
-				@keys.each_pair do |code,keys|
-					puts "#{code} = #{keys}"
+				puts"The following are valid pattern values:\n\n"
+				@keys.keys.each do |layout|
+					puts "\nKeyboard layout: #{layout}"
+					@keys[layout].each_pair do |code,keys|
+						puts "#{code} = #{keys}"
+					end
 				end
 				exit
 			when "--lev-dist"
 				if arg =~ /^[0-9]$/
 					lev_tolerance = arg.to_i
 					if lev_tolerance <= 0
-						puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Please enter a positive distance
-
-"
+						puts"\nPlease enter a positive distance\n\n"
 						exit 1
 					end
 				else
-					puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Invalid Levenshtein tolerance
-
-"
+					puts"\nInvalid Levenshtein tolerance\n\n"
 					exit 1
 				end
 			when "--dictionary"
@@ -138,30 +173,18 @@ Invalid Levenshtein tolerance
 							dictionary << word
 						end
 					rescue Errno::EACCES => e
-						puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Dictionary not found
-
-"
+						puts"\nDictionary not found\n\n"
 						exit 1
 					end
 				else
-					puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Unable to find dictionary
-
-"
+					puts"\nUnable to find dictionary\n\n"
 					exit 1
 				end
 			when "--output"
 				begin
 					output_file = File.new(arg, "w")
 				rescue Errno::EACCES => e
-					puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Unable to open output file
-
-"
+					puts"\nUnable to open output file\n\n"
 					exit 1
 				end
 		end
@@ -171,8 +194,7 @@ rescue GetoptLong::InvalidOption => e
 	usage
 	exit
 rescue => e
-	puts "Something went wrong, please report it to robin@digininja.org along with these messages:"
-	puts
+	puts "Something went wrong, please report it to robin@digininja.org along with these messages:\n\n"
 	puts e.message
 	puts
 	puts e.class.to_s
@@ -185,11 +207,7 @@ rescue => e
 end
 
 if ARGV.length != 1
-	puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-Please specify the pattern to use
-
-"
+	puts"\nPlease specify the pattern to use\n\n"
 	exit 1
 end
 
@@ -198,12 +216,9 @@ pattern = pattern_string.split(",")
 
 pattern.each do |check|
 	if check !~ /^#./
-		if !@keys.has_key?(check)
-			puts"Pat to Pass 1.0 Robin Wood (robin@digininja.org) (www.digininja.org)
-
-			Pattern character #{check} not found in the keys list
-
-"
+		if !@keys["#{@layout}"].has_key?("#{check}")
+			puts"\n
+			Pattern character #{check} not found in the keys list\n\n"
 			exit 1
 		end
 	end
@@ -216,12 +231,12 @@ if basic_looping
 	if first_let =~ /^#(.)/
 		passwords = [$1]
 	else 
-		passwords = @keys[first_let].split("")
+		passwords = @keys["#{@layout}"][first_let].split("")
 	end
 
 	pattern.each do |pos|
 		#puts "processing key " + pos
-		#puts @keys[pos].inspect
+		#puts @keys["#{@layout}"][pos].inspect
 		
 		#puts "password first time through is " + passwords.inspect
 		new_pass = []
@@ -232,7 +247,7 @@ if basic_looping
 				new_pass << pass + let
 			end
 		else
-			@keys[pos].each_char do |let|
+			@keys["#{@layout}"][pos].each_char do |let|
 				#puts "current letter " + let
 				passwords.each do |pass|
 					#puts "the new password is " + pass + let
@@ -253,7 +268,7 @@ else
 
 		#	puts "passed in strings = " + strings.inspect
 		#	puts "Our pos = " + our_pos
-		#	puts @keys[our_pos].split("").inspect
+		#	puts @keys["#{@layout}"][our_pos].split("").inspect
 
 			if our_pos =~ /^#(.)/
 				new_strings = []
@@ -263,7 +278,7 @@ else
 				end
 			else
 				new_strings = []
-				@keys[our_pos].each_char do |char|
+				@keys["#{@layout}"][our_pos].each_char do |char|
 					strings.each do |str|
 						new_strings << str + char
 					end
@@ -283,7 +298,7 @@ else
 	if char =~ /^#(.)/
 		passwords = [$1]
 	else 
-		passwords = @keys[first_let].split("")
+		passwords = @keys["#{@layout}"][first_let].split("")
 	end
 
 	# and fire
