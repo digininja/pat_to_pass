@@ -34,7 +34,7 @@ rescue LoadError
 	# catch error and prodive feedback on installing gem
 	puts "\nError: levenshtein gem not installed\n"
 	puts "\t use: \"gem install levenshtein-ffi\" to install the required gem\n\n"
-	#exit
+	exit
 end
 
 require 'getoptlong'
